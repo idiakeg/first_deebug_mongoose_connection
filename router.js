@@ -107,4 +107,38 @@ router.put("/edit/:id", async (req, res) => {
 		});
 	}
 });
+
+// ======delete a member
+router.delete("/delete/:id", async (req, res) => {
+	const { id } = req.params;
+	if (!id) {
+		return res.status(400).send({
+			status: "error",
+			msg: "Provide the id of the member you'd like to delete",
+		});
+	}
+	try {
+		const memberToBeDeleted = await memberModel.findByIdAndDelete({
+			_id: id,
+		});
+
+		if (!memberToBeDeleted) {
+			return res.status(400).send({
+				status: "error",
+				msg: "user with provided id does not exist on the database",
+			});
+		}
+
+		res.status(200).send({
+			status: "success",
+			msg: "User deleted successfully",
+		});
+	} catch (error) {
+		res.status(500).send({
+			status: "error",
+			msg: error.message,
+		});
+	}
+});
+
 module.exports = router;
