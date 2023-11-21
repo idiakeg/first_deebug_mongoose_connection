@@ -130,8 +130,42 @@ router.delete("/delete/:id", async (req, res) => {
 		}
 
 		res.status(200).send({
-			status: "success",
+			status: "ok",
 			msg: "User deleted successfully",
+		});
+	} catch (error) {
+		res.status(500).send({
+			status: "error",
+			msg: error.message,
+		});
+	}
+});
+
+// ==============get single user
+router.get("/single_member/:id", async (req, res) => {
+	const { id } = req.params;
+	if (!id) {
+		return res.status(400).send({
+			status: "error",
+			msg: "Provide an id",
+		});
+	}
+
+	try {
+		const singleMember = await memberModel.findById({
+			_id: id,
+		});
+
+		if (!singleMember) {
+			return res.status(400).send({
+				status: "error",
+				msg: "No user with the provided id",
+			});
+		}
+
+		res.send({
+			status: "ok",
+			msg: singleMember,
 		});
 	} catch (error) {
 		res.status(500).send({
