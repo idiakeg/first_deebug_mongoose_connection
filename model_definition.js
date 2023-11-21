@@ -13,10 +13,16 @@ const memberSchema = new mongoose.Schema({
 		type: Number,
 		required: [true, "Member must include an age field"],
 	},
-	is_online: Boolean,
+	is_online: {
+		type: Boolean,
+		default: true,
+	},
 	createdAt: {
-		type: Date,
-		default: Date.now,
+		type: String,
+		default: () => new Date().toLocaleString(),
+	},
+	updatedAt: {
+		type: String,
 	},
 });
 
