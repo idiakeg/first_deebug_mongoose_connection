@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const { v4: uuidv4 } = require("uuid");
+// const { v4: uuidv4 } = require("uuid");
 const memberModel = require("./model_definition");
 
-// to get all the users present in the database
+// ============to get all the users present in the database
 router.get("/all_members", async (req, res) => {
 	let msg = "success";
 	try {
@@ -24,7 +24,7 @@ router.get("/all_members", async (req, res) => {
 	}
 });
 
-// to add a member
+// ============to add a member
 router.post("/add", async (req, res) => {
 	// obtain the required fields from the request body
 	const { name, age, occupation } = req.body;
@@ -42,9 +42,7 @@ router.post("/add", async (req, res) => {
 			occupation,
 		}); /* The create method returns a promise that resolves into the document or array of documents  */
 
-		count =
-			createdMember.length; /* You cannot obtain the length of the entire array from here because the createdMember is an object the describes the particular user that was just created. The best place to obtain count is from the "/all_members" route as it access the entire memeberModel collection which is an array of members and hence the length can therefore be obtained */
-		console.log(count);
+		/*count = createdMember.length;  You cannot obtain the length of the entire array from here because the createdMember is an object the describes the particular user that was just created. The best place to obtain count is from the "/all_members" route as it access the entire memeberModel collection which is an array of members and hence the length can therefore be obtained */
 
 		res.status(200).send({
 			status: "ok",
@@ -52,6 +50,57 @@ router.post("/add", async (req, res) => {
 			members: createdMember,
 		});
 	} catch (error) {
+		res.status(500).send({
+			status: "error",
+			msg: error.message,
+		});
+	}
+});
+
+// ============ to update a member
+router.put("/edit/:id", async (req, res) => {
+	const { name, age, occupation, is_online } = req.body;
+	const { id } = req.params;
+
+	// check if the client provided an id in their request
+	if (!id) {
+		// so long as the id provided is seen as valid by mongoose, i.e it matches the requiredbut
+		return res.status(400).send({
+			status: "error",
+			msg: "Please enter an id",
+		});
+	}
+	try {
+		// check id the user with the provided id exists in the DB
+		const userToBeUpdated = await memberModel.findByIdAndUpdate(
+			{
+				_id: id,
+			},
+			{
+				name,
+				age,
+				occupation,
+				is_online,
+				updatedAt: new Date().toLocaleString(),
+			},
+			{ new: true }
+		);
+
+		// the code above returns null if no user with the specified id can be found
+
+		if (!userToBeUpdated) {
+			return res.status(400).send({
+				status: "error",
+				msg: `User with id: ${id} does not exist`,
+			});
+		}
+
+		res.status(200).send({
+			status: "ok",
+			update: userToBeUpdated,
+		});
+	} catch (error) {
+		console.log(error);
 		res.status(500).send({
 			status: "error",
 			msg: error.message,
