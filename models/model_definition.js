@@ -24,7 +24,8 @@ const memberSchema = new mongoose.Schema({
 	updatedAt: {
 		type: String,
 	},
-});
+	is_deleted: {type: Boolean, default: false}
+}, {collection: "members"});
 
 // create a model based on the schema defined above
 

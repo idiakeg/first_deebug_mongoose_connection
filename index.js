@@ -4,7 +4,7 @@ const app = express();
 require("dotenv").config();
 
 const port = process.env.PORT || 6666;
-const memberRouter = require("./router");
+const memberRouter = require("./routes/router");
 
 // set up connection to the local mongoDB
 const connectDB = require("./connect_db");
