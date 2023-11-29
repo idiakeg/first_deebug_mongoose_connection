@@ -7,7 +7,9 @@ const memberModel = require("../models/model_definition");
 router.get("/all_members", async (req, res) => {
 	let msg = "success";
 	try {
-		const allMembers = await memberModel.find({ is_deleted: false });
+		const allMembers = await memberModel
+			.find({ is_deleted: false })
+			.select("-is_deleted");
 		if (!allMembers || allMembers.length === 0) {
 			msg = "There are no members";
 		}
@@ -198,7 +200,7 @@ router.put("/edit/:id", async (req, res) => {
 //This is a better way to delete so that the document doesn't get lost forever
 //That means when fetching for all users, factor this in and fetch online users with
 //is_deleted field as false
-router.post("/delete", async (req, res) => {
+router.delete("/delete/:id", async (req, res) => {
 	const { id } = req.params;
 	if (!id) {
 		return res.status(400).send({
@@ -237,10 +239,12 @@ router.get("/single_member/:id", async (req, res) => {
 	}
 
 	try {
-		const singleMember = await memberModel.findOne({
-			_id: id,
-			is_deleted: false,
-		});
+		const singleMember = await memberModel
+			.findOne({
+				_id: id,
+				is_deleted: false,
+			})
+			.select("-is_deleted");
 
 		if (!singleMember) {
 			return res.status(400).send({
